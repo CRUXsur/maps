@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:geolocator/geolocator.dart';
@@ -6,6 +8,8 @@ part 'gps_event.dart';
 part 'gps_state.dart';
 
 class GpsBloc extends Bloc<GpsEvent, GpsState> {
+  StreamSubscription? gpsServiceSubscription;
+
   //por defecto no tengo permiso y esta deshabilitado!
   GpsBloc()
       : super(const GpsState(
@@ -18,7 +22,6 @@ class GpsBloc extends Bloc<GpsEvent, GpsState> {
         isGpsPermissionGranted: event.isGpsPermissionGranted,
       )),
     );
-
     //lo ponemos en el constructor
     _init();
   }
@@ -29,9 +32,12 @@ class GpsBloc extends Bloc<GpsEvent, GpsState> {
 
   //inicializacion:
   Future<void> _init() async {
-    //
     final isEnabled = await _checkGpsStatus();
     print('isEnabled: $isEnabled');
+    add(GpsAndPermissionEvent(
+      isGpsEnabled: isEnabled, //el estado del GPS es isEnable!
+      isGpsPermissionGranted: state.isGpsPermissionGranted, //es estado actual!
+    ));
   }
 
   //tenemos un listener que esta pendiente de cualquier cambio
@@ -41,13 +47,21 @@ class GpsBloc extends Bloc<GpsEvent, GpsState> {
   //aplicacion siempre es bueno limpiarlo para evitar fugas de memoria
   //
   Future<bool> _checkGpsStatus() async {
-    //
+    //!aqui es cuando se inicializa se carga app y se si esta o no esta
+    //!habilitado
     final isEnable = await Geolocator.isLocationServiceEnabled();
-
-    Geolocator.getServiceStatusStream().listen((event) {
+    //! esta es mi subscripcion
+    gpsServiceSubscription =
+        Geolocator.getServiceStatusStream().listen((event) {
+      // !En este punto es cuando el servicio cambia!, habilito o deshabilitado
       //print('service status $event');
       final isEnabled = (event.index == 1) ? true : false;
-      print('service status $isEnabled');
+      //print('service status $isEnabled');
+      add(GpsAndPermissionEvent(
+        isGpsEnabled: isEnabled, //el estado del GPS es isEnable!
+        isGpsPermissionGranted:
+            state.isGpsPermissionGranted, //es estado actual!
+      ));
     });
     return isEnable;
   }
@@ -56,7 +70,10 @@ class GpsBloc extends Bloc<GpsEvent, GpsState> {
   //deshechar
   @override
   Future<void> close() {
-    // TODO: limpiar el ServiceStatus stream
+    //DONE: limpiar el ServiceStatus stream
+    //? ? :si tienes un valor cancelalo, sino no tienes nada que cancelar
+    //? no hagas
+    gpsServiceSubscription?.cancel();
     return super.close();
   }
 }
