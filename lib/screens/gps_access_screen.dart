@@ -46,7 +46,10 @@ class _AccessButton extends StatelessWidget {
           elevation: 0,
           splashColor: Colors.transparent,
           onPressed: () {
-            //TODO: Por hacer...
+            //el acceso a nuestro bloc, cualquiera de los dos!
+            //final gpsBloc = BlocProvider.of<GpsBloc>(context);
+            final gpsBloc = context.read<GpsBloc>();
+            gpsBloc.askGpsAccess();
           },
         )
       ],
