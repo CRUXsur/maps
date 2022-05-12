@@ -33,12 +33,31 @@ class GpsBloc extends Bloc<GpsEvent, GpsState> {
 
   //inicializacion:
   Future<void> _init() async {
-    final isEnabled = await _checkGpsStatus();
-    print('isEnabled: $isEnabled');
+    //!Future disparados de forma separada
+    //final isEnabled = await _checkGpsStatus();
+    //final isGranted = await _isPermissionGranted();
+    //print('isEnabled: $isEnabled,isGranted: $isGranted');
+    //!Futures, promesas disparadas de manera simultanea!
+    //!gpsInitStatus: regresamos una lista de booleanos!
+    final gpsInitStatus = await Future.wait([
+      _checkGpsStatus(),
+      _isPermissionGranted(),
+    ]);
+    //add(GpsAndPermissionEvent(
+    //  isGpsEnabled: isEnabled, //el estado del GPS es isEnable!
+    //  //isGpsPermissionGranted: state.isGpsPermissionGranted, //es estado actual!
+    //  isGpsPermissionGranted: isGranted, //es estado actual!
+    //));
     add(GpsAndPermissionEvent(
-      isGpsEnabled: isEnabled, //el estado del GPS es isEnable!
-      isGpsPermissionGranted: state.isGpsPermissionGranted, //es estado actual!
+      isGpsEnabled: gpsInitStatus[0],
+      isGpsPermissionGranted: gpsInitStatus[1],
     ));
+  }
+
+  //* me creo un nuevo metodo
+  Future<bool> _isPermissionGranted() async {
+    final isGranted = await Permission.location.isGranted;
+    return isGranted; //regresa un true or false!
   }
 
   //tenemos un listener que esta pendiente de cualquier cambio

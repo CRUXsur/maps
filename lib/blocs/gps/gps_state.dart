@@ -5,6 +5,12 @@ class GpsState extends Equatable {
   final bool isGpsEnabled;
   final bool isGpsPermissionGranted;
 
+  //!me creo un getter,que me diga si todo esta bien
+  //!o alguno de los dos esta mal....
+  //! si los dos true => isAllGranted es true
+  //! si un de los dos es false = > isAllGranted es false
+  bool get isAllGranted => isGpsEnabled && isGpsPermissionGranted;
+
   //llaves: por que quiero que sea por nombre
   const GpsState({
     required this.isGpsEnabled,
