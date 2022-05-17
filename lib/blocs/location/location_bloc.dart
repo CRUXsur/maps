@@ -18,6 +18,11 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
     // on<LocationEvent>((event, emit) {
     //   // TODO: implement event handler
     // });
+    on<OnStartFollowingUser>(
+        (event, emit) => emit(state.copyWith(followingUser: true)));
+    on<OnStopFollowingUser>(
+        (event, emit) => emit(state.copyWith(followingUser: false)));
+
     //!cuando yo recibo un <OnNewUserLocationEvent>
     on<OnNewUserLocationEvent>((event, emit) {
       emit(
@@ -44,6 +49,7 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
 
   //?empezar a darle seguimiento al usuario
   void startFollowingUser() {
+    add(OnStartFollowingUser());
     //print('startFollowingUser');
     positionStream = Geolocator.getPositionStream().listen((event) {
       final position = event;
@@ -58,6 +64,7 @@ class LocationBloc extends Bloc<LocationEvent, LocationState> {
 
   void stopFollowingUser() {
     positionStream?.cancel();
+    add(OnStopFollowingUser());
     print('stopFollowingUser');
   }
 

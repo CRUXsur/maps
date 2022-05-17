@@ -22,3 +22,11 @@ class OnNewUserLocationEvent extends LocationEvent {
   //! este mi nuevo evento lo tengo que manejar en mi location_bloc.....
   const OnNewUserLocationEvent(this.newLocation);
 }
+
+class OnStartFollowingUser extends LocationEvent {
+  //
+}
+
+class OnStopFollowingUser extends LocationEvent {
+  //
+}
