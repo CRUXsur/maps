@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:maps_app/blocs/blocs.dart';
 
 //? convierto de statelesws a statefulw,
@@ -45,10 +46,16 @@ class _MapScreenState extends State<MapScreen> {
           return const Center(child: Text('Espere por favor...'));
         }
         //
-        return Center(
-          child: Text(
-              '${state.lastKnownLocation!.latitude},${state.lastKnownLocation!.longitude}'),
+        // return Center(
+        //   child: Text(
+        //       '${state.lastKnownLocation!.latitude},${state.lastKnownLocation!.longitude}'),
+        // );
+        //
+        final CameraPosition initialCameraPosition = CameraPosition(
+          target: state.lastKnownLocation!,
+          zoom: 15,
         );
+        return GoogleMap(initialCameraPosition: initialCameraPosition);
       },
     ));
   }
